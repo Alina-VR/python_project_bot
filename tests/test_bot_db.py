@@ -11,9 +11,12 @@ def base_connection(tmp_path):
     with sqlite3.connect(base_path) as con:
         cur = con.cursor()
         cur.execute(
-            "create table users(id integer primary key autoincrement, user_id integer unique, user_join_date datetime not null default (datetime('now')))")
+            "create table users(id integer primary key autoincrement, user_id integer unique,"
+            "user_join_date datetime not null default (datetime('now')))")
         cur.execute(
-            "create table records(id integer primary key autoincrement, user_id integer not null, event text not null, event_time datetime not null, changing_date datetime not null default (datetime('now')), foreign key (user_id) references users (id))")
+            "create table records(id integer primary key autoincrement, user_id integer not null, event text not null,"
+            " event_time datetime not null, changing_date datetime not null default (datetime('now')), "
+            "foreign key (user_id) references users (id))")
 
     base_bot = bot_db.BotDB(base_path)
     return base_bot

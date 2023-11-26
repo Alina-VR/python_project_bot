@@ -1,5 +1,4 @@
 import datetime
-
 import telebot
 import config
 from bot_db import BotDB, DELTA_UTC
@@ -10,6 +9,11 @@ bot = telebot.TeleBot(config.TOKEN)
 
 @bot.message_handler(commands=['start'])
 def welcome(message):
+    """A function that send a user a greet message and add him to database
+
+    :param message: Message
+    :return: None
+    """
     if not bot_db.is_user_in_db(message.from_user.id):
         bot_db.add_user(message.from_user.id)
     sticker = open('hello-sticker.tgs', 'rb')
@@ -22,18 +26,33 @@ def welcome(message):
 
 @bot.message_handler(commands=['record_event'])
 def record_event(message):
+    """A function that record event after user's reply
+
+    :param message: Message
+    :return: None
+    """
     hold_message = bot.send_message(message.chat.id, 'Напиши событие, которое хочешь записать, и его дату и время '
                                                      'в формате: yyyy mm dd hh mm')
     bot.register_next_step_handler(hold_message, add_event_with_feedback)
 
 
 def add_event_with_feedback(message):
+    """A function that add event with extra message from bot
+
+    :param message: Message
+    :return: None
+    """
     bot_db.add_event(message)
     bot.send_message(message.chat.id, 'Отлично, событие записано!')
 
 
 @bot.message_handler(commands=['today_events'])
 def show_events(message):
+    """A function that show to user his events within this day with extra messages
+
+    :param message: Message
+    :return: None
+    """
     records = bot_db.get_events(message.from_user.id, 'day')
     if len(records):
         answer = 'Все события за день \n'
@@ -47,6 +66,11 @@ def show_events(message):
 
 @bot.message_handler(commands=['month_events'])
 def show_events(message):
+    """A function that show to user his events within this month with extra messages
+
+    :param message: Message
+    :return: None
+    """
     records = bot_db.get_events(message.from_user.id, 'month')
     if len(records):
         answer = 'Все события за месяц \n'
@@ -60,6 +84,11 @@ def show_events(message):
 
 @bot.message_handler(commands=['all_events'])
 def show_events(message):
+    """A function that show to user all his events with extra messages
+
+    :param message: Message
+    :return: None
+    """
     records = bot_db.get_events(message.from_user.id, 'all')
     if len(records):
         answer = 'Все события \n'
@@ -73,6 +102,11 @@ def show_events(message):
 
 @bot.message_handler(commands=['help'])
 def help(message):
+    """A function that gives a user list of his possible actions in a dialogue with this bot
+
+    :param message: Message
+    :return: None
+    """
     bot.send_message(message.chat.id, 'Давай я расскажу тебе, что я могу😊\nКак только ты напишешь мне /start - я '
                                       'запомню тебя, и смогу запоминать также твои события.\nПиши /record_event чтобы '
                                       'записать событие.\n Если хочешь вспомнить свои события за день - '
@@ -82,6 +116,11 @@ def help(message):
 
 @bot.message_handler(content_types=['text'])
 def answer(message):
+    """A function that gives to user a reply to messages that bot cannot recognize
+
+    :param message: Message
+    :return: None
+    """
     bot.send_message(message.chat.id, 'Извини, пока не понимаю')
     sticker = open('sorry_sticker.tgs', 'rb')
     bot.send_sticker(message.chat.id, sticker)
